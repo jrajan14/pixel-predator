@@ -1,4 +1,4 @@
-# [PIXEL PURSUIT] 🎮🌈
+# PIXEL PURSUIT 🎮
 
 **A vibrant survival game where colors hunt you!** Dodge relentless enemies, collect golden pixels, and survive as long as you can in this fast-paced arcade thriller.
 

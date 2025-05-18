@@ -263,13 +263,13 @@ class ColorChaseGame {
             this.player.y = Math.max(0, this.player.y - speed);
         }
         if (this.keys['ArrowDown'] || this.keys['s'] || this.keys['S']) {
-            this.player.y = Math.min(this.canvas.height - this.player.height, this.player.y + speed);
+            this.player.y = Math.min(this.canvas.height - this.player.height - 1, this.player.y + speed);
         }
         if (this.keys['ArrowLeft'] || this.keys['a'] || this.keys['A']) {
             this.player.x = Math.max(0, this.player.x - speed);
         }
         if (this.keys['ArrowRight'] || this.keys['d'] || this.keys['D']) {
-            this.player.x = Math.min(this.canvas.width - this.player.width, this.player.x + speed);
+            this.player.x = Math.min(this.canvas.width - this.player.width - 1, this.player.x + speed);
         }
     }
     
@@ -329,12 +329,12 @@ class ColorChaseGame {
             // Bounce off walls
             if (enemy.x <= 0 || enemy.x >= this.canvas.width - enemy.width) {
                 enemy.dx *= -1;
-                enemy.x = Math.max(0, Math.min(this.canvas.width - enemy.width, enemy.x));
+                enemy.x = Math.max(0, Math.min(this.canvas.width - enemy.width - 1, enemy.x));
             }
             
             if (enemy.y <= 0 || enemy.y >= this.canvas.height - enemy.height) {
                 enemy.dy *= -1;
-                enemy.y = Math.max(0, Math.min(this.canvas.height - enemy.height, enemy.y));
+                enemy.y = Math.max(0, Math.min(this.canvas.height - enemy.height - 1, enemy.y));
             }
         }
     }

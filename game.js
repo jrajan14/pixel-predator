@@ -23,6 +23,10 @@ class ColorChaseGame {
         this.lastTimestamp = 0;
         this.enemySpawnInterval = 0;
         this.gameOverTextVisible = false;
+        this.isMobile = false;
+        this.beta = 0; // left/right tilt
+        this.gamma = 0; // front/back tilt
+        this.tiltDot = null;
         this.canvas = document.getElementById('gameCanvas');
         this.ctx = this.canvas.getContext('2d');
         this.startButton = document.getElementById('startButton');
@@ -37,8 +41,52 @@ class ColorChaseGame {
         // Load high score from localStorage
         this.highScore = parseInt(localStorage.getItem('highScore') || '0');
         this.highScoreDisplay.textContent = this.highScore.toString();
+        this.detectMobile();
+        this.setupGyroControls();
+        this.tiltDot = document.querySelector('.tilt-dot');
         // Start game loop
         this.gameLoop(0);
+    }
+    detectMobile() {
+        this.isMobile = (('ontouchstart' in window) ||
+            (navigator.maxTouchPoints > 0));
+    }
+    setupGyroControls() {
+        var _a;
+        if (!this.isMobile)
+            return;
+        // Request permission for iOS 13+ devices
+        if (window.DeviceOrientationEvent &&
+            typeof DeviceOrientationEvent.requestPermission === 'function') {
+            const requestPermissionButton = document.createElement('button');
+            requestPermissionButton.textContent = 'Enable Tilt Controls';
+            requestPermissionButton.classList.add('gyro-permission-btn');
+            (_a = document.querySelector('.controls')) === null || _a === void 0 ? void 0 : _a.appendChild(requestPermissionButton);
+            requestPermissionButton.addEventListener('click', () => {
+                DeviceOrientationEvent.requestPermission()
+                    .then((response) => {
+                    if (response === 'granted') {
+                        window.addEventListener('deviceorientation', this.handleOrientation.bind(this));
+                        requestPermissionButton.remove();
+                    }
+                });
+            });
+        }
+        else {
+            // For non-iOS devices
+            window.addEventListener('deviceorientation', this.handleOrientation.bind(this));
+        }
+    }
+    handleOrientation(event) {
+        this.beta = event.beta || 0; // -180 to 180 (left/right tilt)
+        this.gamma = event.gamma || 0; // -90 to 90 (front/back tilt)
+        // Update the visual indicator
+        if (this.tiltDot) {
+            const maxMovement = 50;
+            const x = Math.max(-maxMovement, Math.min(maxMovement, this.gamma * 2));
+            const y = Math.max(-maxMovement, Math.min(maxMovement, (this.beta - 20) * 2));
+            this.tiltDot.style.transform = `translate(calc(-50% + ${x}px), calc(-50% + ${y}px))`;
+        }
     }
     initEventListeners() {
         window.addEventListener('resize', this.resizeCanvas.bind(this));
@@ -61,17 +109,6 @@ class ColorChaseGame {
         // Set canvas dimensions
         this.canvas.width = container.clientWidth;
         this.canvas.height = Math.max(availableHeight, 100); // Ensure minimum height
-        // Optional: Maintain aspect ratio (e.g., 16:9)
-        /*
-        const targetAspect = 16 / 9;
-        const currentAspect = this.canvas.width / this.canvas.height;
-        
-        if (currentAspect > targetAspect) {
-            this.canvas.height = this.canvas.width / targetAspect;
-        } else {
-            this.canvas.width = this.canvas.height * targetAspect;
-        }
-        */
         // Handle high DPI displays
         const dpr = window.devicePixelRatio || 1;
         this.canvas.width *= dpr;
@@ -201,6 +238,23 @@ class ColorChaseGame {
         }
         if (this.keys['ArrowRight'] || this.keys['d'] || this.keys['D']) {
             this.player.x = Math.min(this.canvas.width - this.player.width - 1, this.player.x + speed);
+        }
+        // Gyroscope controls (mobile)
+        if (this.isMobile && (this.beta !== 0 || this.gamma !== 0)) {
+            const sensitivity = 0.5;
+            const maxTilt = 30; // degrees
+            // Vertical movement (beta)
+            if (Math.abs(this.beta) > 10) { // dead zone
+                const verticalRatio = Math.min(1, Math.abs(this.beta - 20) / maxTilt);
+                const verticalDirection = this.beta > 20 ? 1 : -1;
+                this.player.y = Math.max(0, Math.min(this.canvas.height - this.player.height, this.player.y + (speed * verticalRatio * verticalDirection * sensitivity)));
+            }
+            // Horizontal movement (gamma)
+            if (Math.abs(this.gamma) > 10) { // dead zone
+                const horizontalRatio = Math.min(1, Math.abs(this.gamma) / maxTilt);
+                const horizontalDirection = this.gamma > 0 ? 1 : -1;
+                this.player.x = Math.max(0, Math.min(this.canvas.width - this.player.width, this.player.x + (speed * horizontalRatio * horizontalDirection * sensitivity)));
+            }
         }
     }
     updateEnemies(deltaTime) {

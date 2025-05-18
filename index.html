@@ -1,32 +1,33 @@
 <!DOCTYPE html>
-
-<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
     <title>Pixel Predator</title>
     <link rel="stylesheet" href="styles.css">
 </head>
 <body>
     <div class="game-container">
         <div class="game-header">
-            <h1>Pixel predator</h1>
+            <h1>Pixel Predator</h1>
             <div class="score-display">
                 <div>Score: <span id="score">0</span></div>
-                <div>High Score: <span id="high-score">0</span></div>
+                <div>High: <span id="high-score">0</span></div>
             </div>
         </div>
-        <canvas id="gameCanvas"></canvas>
+        <div class="canvas-container">
+            <canvas id="gameCanvas"></canvas>
+            <!-- Add these mobile controls inside canvas container -->
+            <div id="mobileControls" class="mobile-controls">
+                <div class="tilt-indicator">
+                    <div class="tilt-dot"></div>
+                </div>
+                <div class="mobile-instruction">Tilt device to move</div>
+            </div>
+        </div>
         <div class="controls">
             <button id="startButton">START</button>
-        </div>
-        <div id="mobileControls" class="mobile-controls">
-            <div class="tilt-indicator">
-                <div class="tilt-dot"></div>
-            </div>
-            <div class="mobile-instruction">Tilt device to move</div>
+            <!-- iOS permission button will be added by JavaScript -->
         </div>
     </div>
     <script src="game.js"></script>

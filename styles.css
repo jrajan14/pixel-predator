@@ -1,85 +1,109 @@
+/* Base Styles */
 body {
     margin: 0;
     padding: 0;
-    font-family: Arial, sans-serif;
+    font-family: 'Arial', sans-serif;
     background-color: #162c42;
     color: #ecf0f1;
-    display: flex;
-    justify-content: center;
-    align-items: center;
-    min-height: 100vh;
-    box-sizing: border-box;
+    height: 100vh;
+    overflow: hidden;
+    touch-action: manipulation; /* Disable browser zoom gestures */
 }
 
+/* Main Game Container */
 .game-container {
     display: flex;
     flex-direction: column;
-    width: 96vw; 
-    height: 96vh;
-    max-width: 1200px;
-    max-height: 800px;
-    padding: 0;
-    margin: 0;
-    gap: 10px;
-    overflow: hidden;
+    width: 100vw;
+    height: 100vh;
+    max-width: 100%;
+    box-sizing: border-box;
+    position: relative;
 }
 
+/* Header Section */
 .game-header {
-    width: 100%;
     display: flex;
     justify-content: space-between;
     align-items: center;
-    padding: 0 5px;
+    padding: 10px 15px;
+    background-color: rgba(0, 0, 0, 0.3);
+    flex-shrink: 0;
+    min-height: 50px;
+}
+
+.game-header h1 {
     margin: 0;
+    font-size: clamp(1rem, 4vw, 1.5rem);
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    max-width: 50%;
 }
 
 .score-display {
     display: flex;
-    gap: 20px;
-    font-size: 1.2rem;
+    gap: clamp(10px, 3vw, 20px);
+    font-size: clamp(0.9rem, 3vw, 1.2rem);
 }
 
-canvas {
+.score-display span {
+    min-width: 40px;
+    display: inline-block;
+    text-align: right;
+}
+
+/* Canvas Area */
+.canvas-container {
+    flex-grow: 1;
     position: relative;
+    overflow: hidden;
 }
 
 #gameCanvas {
     background-color: #0fa701;
     border: 3px solid #000000;
-    border-radius: 5px;
+    display: block;
     width: 100%;
-    height: calc(100% - 60px);
-    flex-grow: 1;
-    margin: 0;
+    height: 100%;
 }
 
+/* Controls Section */
 .controls {
-    margin-top: 5px 0;
+    padding: 10px;
+    text-align: center;
+    background-color: rgba(0, 0, 0, 0.3);
+    flex-shrink: 0;
 }
 
 button {
     padding: 10px 20px;
-    font-size: 1.2rem;
+    font-size: clamp(1rem, 4vw, 1.2rem);
     background-color: #00a2ff;
     color: white;
     border: none;
     border-radius: 5px;
     cursor: pointer;
     transition: background-color 0.3s;
+    width: 80%;
+    max-width: 200px;
 }
 
 button:hover {
     background-color: #2495c9;
 }
 
+/* Game Over Text */
 .game-over-text {
     position: absolute;
     top: 50%;
     left: 50%;
     transform: translate(-50%, -50%);
     color: white;
-    font-size: 48px;
+    font-size: clamp(2rem, 8vw, 3rem);
     text-align: center;
+    text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.8);
+    width: 90%;
 }
 
 /* Mobile Controls */
@@ -87,14 +111,16 @@ button:hover {
     display: none;
     position: absolute;
     bottom: 20px;
-    width: 100%;
+    left: 0;
+    right: 0;
     text-align: center;
     z-index: 10;
+    pointer-events: none;
 }
 
 .tilt-indicator {
-    width: 150px;
-    height: 150px;
+    width: clamp(100px, 30vw, 150px);
+    height: clamp(100px, 30vw, 150px);
     background: rgba(0, 0, 0, 0.3);
     border-radius: 50%;
     margin: 0 auto;
@@ -103,8 +129,8 @@ button:hover {
 }
 
 .tilt-dot {
-    width: 30px;
-    height: 30px;
+    width: clamp(20px, 8vw, 30px);
+    height: clamp(20px, 8vw, 30px);
     background: #3498db;
     border-radius: 50%;
     position: absolute;
@@ -116,29 +142,59 @@ button:hover {
 
 .mobile-instruction {
     color: white;
-    margin-top: 10px;
-    font-size: 1.2rem;
+    margin-top: 8px;
+    font-size: clamp(0.8rem, 3vw, 1rem);
     text-shadow: 1px 1px 2px black;
 }
 
-/* Show mobile controls only on mobile */
+/* Gyro Permission Button */
+.gyro-permission-btn {
+    padding: 8px 12px;
+    background: #e67e22;
+    color: white;
+    border: none;
+    border-radius: 4px;
+    font-size: 0.9rem;
+    margin: 8px auto;
+    display: block;
+    cursor: pointer;
+    pointer-events: auto;
+}
+
+/* Mobile Specific Styles */
 @media (hover: none) and (pointer: coarse) {
     .mobile-controls {
         display: block;
     }
+    
+    .game-header {
+        padding: 5px 10px;
+    }
+    
+    .score-display {
+        flex-direction: column;
+        gap: 2px;
+    }
+    
+    button {
+        padding: 12px 24px;
+        font-size: 1.1rem;
+    }
 }
 
-.gyro-permission-btn {
-    padding: 10px 15px;
-    background: #e67e22;
-    color: white;
-    border: none;
-    border-radius: 5px;
-    font-size: 1rem;
-    margin-top: 10px;
-    cursor: pointer;
-}
-
-.gyro-permission-btn:hover {
-    background: #d35400;
+/* Very small screens */
+@media (max-height: 500px) {
+    .game-header {
+        padding: 2px 5px;
+        min-height: 40px;
+    }
+    
+    .mobile-controls {
+        bottom: 10px;
+    }
+    
+    .tilt-indicator {
+        width: 80px;
+        height: 80px;
+    }
 }

@@ -100,24 +100,24 @@ class ColorChaseGame {
         });
     }
     resizeCanvas() {
-        var _a, _b;
-        const container = this.canvas.parentElement;
-        // Get available space considering the header and button
-        const headerHeight = ((_a = document.querySelector('.game-header')) === null || _a === void 0 ? void 0 : _a.clientHeight) || 50;
-        const controlsHeight = ((_b = document.querySelector('.controls')) === null || _b === void 0 ? void 0 : _b.clientHeight) || 50;
-        const availableHeight = container.clientHeight - headerHeight - controlsHeight - 20; // 20px for gaps
-        // Set canvas dimensions
-        this.canvas.width = container.clientWidth;
-        this.canvas.height = Math.max(availableHeight, 100); // Ensure minimum height
-        // Handle high DPI displays
+        const container = document.querySelector('.canvas-container');
+        if (!container)
+            return;
+        // Get display size (CSS pixels)
+        const displayWidth = container.clientWidth;
+        const displayHeight = container.clientHeight;
+        // Set CSS display size
+        this.canvas.style.width = `${displayWidth}px`;
+        this.canvas.style.height = `${displayHeight}px`;
+        // Set internal size (scaled for sharpness)
         const dpr = window.devicePixelRatio || 1;
-        this.canvas.width *= dpr;
-        this.canvas.height *= dpr;
+        this.canvas.width = Math.floor(displayWidth * dpr);
+        this.canvas.height = Math.floor(displayHeight * dpr);
+        // Scale the drawing context
         this.ctx.scale(dpr, dpr);
-        // Redraw if game is in progress
-        if (this.state === 'playing') {
+        // Redraw if game is running
+        if (this.state === 'playing')
             this.render();
-        }
     }
     handleStartButton() {
         this.resetGame(); // clean up first
@@ -226,18 +226,21 @@ class ColorChaseGame {
         }
     }
     updatePlayer(deltaTime) {
-        const speed = this.player.speed * (deltaTime / 16); // Normalize speed
+        const speed = this.player.speed * (deltaTime / 16);
+        const dpr = window.devicePixelRatio || 1;
+        const canvasWidth = this.canvas.width / dpr;
+        const canvasHeight = this.canvas.height / dpr;
         if (this.keys['ArrowUp'] || this.keys['w'] || this.keys['W']) {
             this.player.y = Math.max(0, this.player.y - speed);
         }
         if (this.keys['ArrowDown'] || this.keys['s'] || this.keys['S']) {
-            this.player.y = Math.min(this.canvas.height - this.player.height - 1, this.player.y + speed);
+            this.player.y = Math.min(this.canvas.height - this.player.height, this.player.y + speed);
         }
         if (this.keys['ArrowLeft'] || this.keys['a'] || this.keys['A']) {
             this.player.x = Math.max(0, this.player.x - speed);
         }
         if (this.keys['ArrowRight'] || this.keys['d'] || this.keys['D']) {
-            this.player.x = Math.min(this.canvas.width - this.player.width - 1, this.player.x + speed);
+            this.player.x = Math.min(this.canvas.width - this.player.width, this.player.x + speed);
         }
         // Gyroscope controls (mobile)
         if (this.isMobile && (this.beta !== 0 || this.gamma !== 0)) {
@@ -305,11 +308,11 @@ class ColorChaseGame {
             // Bounce off walls
             if (enemy.x <= 0 || enemy.x >= this.canvas.width - enemy.width) {
                 enemy.dx *= -1;
-                enemy.x = Math.max(0, Math.min(this.canvas.width - enemy.width - 1, enemy.x));
+                enemy.x = Math.max(0, Math.min(this.canvas.width - enemy.width, enemy.x));
             }
             if (enemy.y <= 0 || enemy.y >= this.canvas.height - enemy.height) {
                 enemy.dy *= -1;
-                enemy.y = Math.max(0, Math.min(this.canvas.height - enemy.height - 1, enemy.y));
+                enemy.y = Math.max(0, Math.min(this.canvas.height - enemy.height, enemy.y));
             }
         }
     }
